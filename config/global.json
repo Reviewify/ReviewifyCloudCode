@@ -1,0 +1,14 @@
+{
+  "global": {
+    "parseVersion": "1.4.2"
+  },
+  "applications": {
+    "Reviewify": {
+      "applicationId": "aS5JfOEzT7lLooye3NQCzkFQagbUXaQVhKX24wnE",
+      "masterKey": "fk8nhYNcLujVLwm3D4Ly811zMCVG0MFpoT0Xa1XB"
+    },
+    "_default": {
+      "link": "Reviewify"
+    }
+  }
+}
