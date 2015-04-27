@@ -1,4 +1,11 @@
-
+Parse.Cloud.beforeSave(Parse.User, function(request, response) {
+                       var newACL = new Parse.ACL();
+                       
+                       newACL.setPublicWriteAccess(false);
+                       
+                       request.object.setACL(newACL);
+                       response.success();
+                       });
 
 Parse.Cloud.define('isRestaurant', function(req, response){
                    Parse.Cloud.useMasterKey();
