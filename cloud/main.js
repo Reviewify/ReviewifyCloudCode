@@ -1,3 +1,13 @@
+Parse.Cloud.beforeSave("Reviews", function(request, response) {
+                       var newACL = new Parse.ACL();
+                       
+                       newACL.setPublicWriteAccess(false);
+                       newACL.setPublicReadAccess(true);
+                       
+                       request.object.setACL(newACL);
+                       response.success();
+                       });
+
 Parse.Cloud.beforeSave(Parse.User, function(request, response) {
                        var newACL = new Parse.ACL();
                        
@@ -84,8 +94,6 @@ Parse.Cloud.define("ReviewMeal", function(request, response) {
                    var restaurantCode = request.params.restaurantCode;
                    var mealCode = request.params.mealCode;
                    var potentialReward = parseInt(request.params.potentialReward);
-                   var review = request.params.review;
-                   var starRating = request.params.starRating;
                    
                    var validationQuery = new Parse.Query("Meals");
                    validationQuery.equalTo("restaurant", restaurantCode);
@@ -100,10 +108,10 @@ Parse.Cloud.define("ReviewMeal", function(request, response) {
                                         var potentialRewardInt = parseInt(potentialReward)
                                         
                                         if (claimed == true) {
-                                        response.error("Meal Claimed");
+                                        response.error("This meal has already been claimed.");
                                         }
                                         else if (potentialRewardInt != mealReward) {
-                                        response.error("Invalid Reward Value");
+                                        response.error("The given reward value doesn't match our records.");
                                         }
                                         else {
                                         claimMeal(mealObject, username);
@@ -111,7 +119,7 @@ Parse.Cloud.define("ReviewMeal", function(request, response) {
                                         }
                                         }
                                         else {
-                                        response.error("Meal Not Found");
+                                        response.error("This meal was not found.");
                                         }
                                         },
                                         error: function(error) {
