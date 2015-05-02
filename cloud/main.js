@@ -1,8 +1,39 @@
-Parse.Cloud.beforeSave("Reviews", function(request, response) {
-                       var newACL = new Parse.ACL();
+
+Parse.Cloud.beforeSave("Deals", function(request, response) {
+                       var newACL = new Parse.ACL(request.user);
                        
                        newACL.setPublicWriteAccess(false);
                        newACL.setPublicReadAccess(true);
+                       
+                       request.object.setACL(newACL);
+                       response.success();
+                       });
+
+Parse.Cloud.beforeSave("Meals", function(request, response) {
+                       var newACL = new Parse.ACL(request.user);
+                       
+                       newACL.setPublicWriteAccess(false);
+                       newACL.setPublicReadAccess(false);
+                       
+                       request.object.setACL(newACL);
+                       response.success();
+                       });
+
+Parse.Cloud.beforeSave("Servers", function(request, response) {
+                       var newACL = new Parse.ACL(request.user);
+                       
+                       newACL.setPublicWriteAccess(false);
+                       newACL.setPublicReadAccess(false);
+                       
+                       request.object.setACL(newACL);
+                       response.success();
+                       });
+
+Parse.Cloud.beforeSave("Reviews", function(request, response) {
+                       var newACL = new Parse.ACL(request.user);
+                       
+                       newACL.setPublicWriteAccess(false);
+                       newACL.setPublicReadAccess(false);
                        
                        request.object.setACL(newACL);
                        response.success();
@@ -12,8 +43,10 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
                        var newACL = new Parse.ACL();
                        
                        newACL.setPublicWriteAccess(false);
+                       newACL.setPublicReadAccess(true);
                        
                        request.object.setACL(newACL);
+                       request.object.save();
                        response.success();
                        });
 
@@ -60,7 +93,7 @@ Parse.Cloud.define("VerifyMeal", function(request, response) {
                    var mealCode = request.params.mealCode;
                    
                    var validationQuery = new Parse.Query("Meals");
-                   validationQuery.equalTo("restaurant", restaurantCode);
+                   validationQuery.equalTo("restaurant_objectId", restaurantCode);
                    validationQuery.equalTo("objectId", mealCode);
                    
                    validationQuery.find({
@@ -96,7 +129,7 @@ Parse.Cloud.define("ReviewMeal", function(request, response) {
                    var potentialReward = parseInt(request.params.potentialReward);
                    
                    var validationQuery = new Parse.Query("Meals");
-                   validationQuery.equalTo("restaurant", restaurantCode);
+                   validationQuery.equalTo("restaurant_objectId", restaurantCode);
                    validationQuery.equalTo("objectId", mealCode);
                    
                    validationQuery.find({
