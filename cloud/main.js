@@ -10,12 +10,14 @@ Parse.Cloud.beforeSave("Deals", function(request, response) {
                        });
 
 Parse.Cloud.beforeSave("Meals", function(request, response) {
-                       var newACL = new Parse.ACL(request.user);
-                       
-                       newACL.setPublicWriteAccess(false);
-                       newACL.setPublicReadAccess(false);
-                       
-                       request.object.setACL(newACL);
+                       if (!request.object.existed()) {
+                           var newACL = new Parse.ACL(request.user);
+                           
+                           newACL.setPublicWriteAccess(false);
+                           newACL.setPublicReadAccess(false);
+                           
+                           request.object.setACL(newACL);
+                       }
                        response.success();
                        });
 
