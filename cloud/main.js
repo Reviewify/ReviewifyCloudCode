@@ -25,7 +25,7 @@ Parse.Cloud.beforeSave("Servers", function(request, response) {
                        var newACL = new Parse.ACL(request.user);
                        
                        newACL.setPublicWriteAccess(false);
-                       newACL.setPublicReadAccess(false);
+                       newACL.setPublicReadAccess(true);
                        
                        request.object.setACL(newACL);
                        response.success();
