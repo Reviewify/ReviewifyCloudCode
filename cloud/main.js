@@ -52,6 +52,54 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
                        response.success();
                        });
 
+Parse.Cloud.define('ChargeUser', function(request, response) {
+                   Parse.Cloud.useMasterKey();
+                   if (!request.params.username) {
+                   response.error('Username has not been provided');
+                   }
+                   if (!request.params.userToCharge) {
+                   response.error('User To Charge has not been provided');
+                   }
+                   if (!request.params.cost) {
+                   response.error('Cost has not been provided');
+                   }
+                   
+                   var costInt = parseInt(request.params.cost)
+                   if (costInt < 0) {
+                   response.error('The provided cost must be 0 or greater');
+                   }
+                   
+                   var queryRole = new Parse.Query(Parse.Role);
+                   queryRole.equalTo('name', 'Restaurant');
+                   
+                   queryRole.first({
+                                   success: function(r){
+                                   var role = r;
+                                   var relation = new Parse.Relation(role, 'users');
+                                   var admins = relation.query();
+                                   
+                                   admins.equalTo('username', request.params.username)
+                                   admins.first({
+                                                success: function(u){
+                                                var user = u;
+                                                
+                                                if(user){
+                                                    rewardUser(request.params.userToCharge, -1 * costInt, response);
+                                                }else{
+                                                response.error('User is not admin');
+                                                }
+                                                },
+                                                error: function(){
+                                                response.error('Error on user lookup');
+                                                }
+                                                })
+                                   },
+                                   error: function(){
+                                   response.error('User admin check failed');
+                                   }
+                                   });
+                   });
+
 Parse.Cloud.define('isRestaurant', function(req, response){
                    Parse.Cloud.useMasterKey();
                    if(!req.params.username){
@@ -142,6 +190,10 @@ Parse.Cloud.define("ReviewMeal", function(request, response) {
                                         var mealReward = parseInt(mealObject.get("potential_reward"));
                                         var potentialRewardInt = parseInt(potentialReward)
                                         
+                                        if (potentialRewardInt < 0) {
+                                            response.error("A reward of 0 or more is required.");
+                                        }
+                                        
                                         if (claimed == true) {
                                         response.error("This meal has already been claimed.");
                                         }
@@ -174,6 +226,7 @@ function rewardUser(username, reward, response) {
             userPointsQuery.find({
                        success: function(results) {
                             var points;
+                                 var newPoints = -1
                             if (results.length > 0) {
                                 points = results[0]
                                 var currentTotalRewards = points.get("points")
@@ -189,17 +242,22 @@ function rewardUser(username, reward, response) {
                                 points.set("points", reward)
                                 points.set("username", username)
                             }
-                            points.save(null, {
-                                success: function(savedPoints) {
-                                    // Execute any logic that should take place after the object is saved.
-                                    response.success(savedPoints.get("points"));
-                                },
-                                error: function(savedPoints, error) {
-                                    // Execute any logic that should take place if the save fails.
-                                    // error is a Parse.Error with an error code and message.
-                                    response.error(error)
-                                }
-                            });
+                            if (newPoints >= 0) {
+                                 points.save(null, {
+                                             success: function(savedPoints) {
+                                             // Execute any logic that should take place after the object is saved.
+                                             response.success(savedPoints.get("points"));
+                                             },
+                                             error: function(savedPoints, error) {
+                                             // Execute any logic that should take place if the save fails.
+                                             // error is a Parse.Error with an error code and message.
+                                             response.error(error)
+                                             }
+                                             });
+                            }
+                            else {
+                                response.error("The user doesn't have enough points for this deal.")
+                            }
                        },
                        error: function(error) {
                             response.error(error);
