@@ -238,6 +238,7 @@ function rewardUser(username, reward, response) {
                        
                                 // Create a new instance of that class.
                                 points = new Points();
+                                newPoints = reward
                        
                                 points.set("points", reward)
                                 points.set("username", username)
