@@ -151,13 +151,27 @@ Parse.Cloud.define("VerifyMeal", function(request, response) {
                                         if (results.length == 1) {
                                         var mealObject = results[0];
                                         var claimed = mealObject.get("claimed");
-                                        
-                                        if (claimed == true) {
-                                        response.error("Meal Claimed");
-                                        }
-                                        else {
-                                        response.success(mealObject);
-                                        }
+                                        var newACL = mealObject.getACL();
+                                        newACL.setReadAccess(request.user, true);
+                                        mealObject.setACL(newACL);
+                                        mealObject.save(null, {
+                                                            success: function(meal) {
+                                                                if (claimed == true) {
+                                                                response.error("Meal Claimed");
+                                                                }
+                                                                else {
+                                                                response.success(mealObject);
+                                                                }
+                                                            },
+                                                            error: function(meal, error) {
+                                                                if (claimed == true) {
+                                                                response.error("Meal Claimed");
+                                                                }
+                                                                else {
+                                                                response.success(mealObject);
+                                                                }
+                                                            }
+                                                            });
                                         }
                                         else {
                                         response.error("Meal Not Found");
