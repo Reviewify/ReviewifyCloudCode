@@ -1,3 +1,12 @@
+Parse.Cloud.beforeSave("Points", function(request, response) {
+                       var newACL = new Parse.ACL();
+                       
+                       newACL.setPublicWriteAccess(false);
+                       newACL.setPublicReadAccess(true);
+                       
+                       request.object.setACL(newACL);
+                       response.success();
+                       });
 
 Parse.Cloud.beforeSave("Deals", function(request, response) {
                        var newACL = new Parse.ACL(request.user);
@@ -152,7 +161,7 @@ Parse.Cloud.define("VerifyMeal", function(request, response) {
                                         var mealObject = results[0];
                                         var claimed = mealObject.get("claimed");
                                         var newACL = mealObject.getACL();
-                                        newACL.setReadAccess(request.user, true);
+                                        newACL.setReadAccess(request.user.id, true);
                                         mealObject.setACL(newACL);
                                         mealObject.save(null, {
                                                             success: function(meal) {
