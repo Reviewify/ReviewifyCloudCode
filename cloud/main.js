@@ -61,6 +61,32 @@ Parse.Cloud.beforeSave(Parse.User, function(request, response) {
                        response.success();
                        });
 
+Parse.Cloud.define('JoinWaitlist', function(request, response){
+                   Parse.Cloud.useMasterKey();
+                   if(!request.params.phone_number || !request.params.email) {
+                   response.error('Phone number or e-mail is required to sign-up for the waitlist')
+                   }
+                   else {
+                   var location = request.params.location
+                   var phoneNumber = request.params.phone_number
+                   var email = request.params.email
+                   var name = request.params.name
+                   var waitlist = new Parse.Object("Waitlist");
+                   waitlist.set("location", location)
+                   waitlist.set("phone_number", phoneNumber)
+                   waitlist.set("email", email)
+                   waitlist.set("name", name)
+                   waitlist.save(null,{
+                                 success: function (object) {
+                                 response.success(object);
+                                 },
+                                 error: function (object, error) {
+                                 response.error(error);
+                                 }
+                                 });
+                   }
+                   });
+
 Parse.Cloud.define('ChargeUser', function(request, response) {
                    Parse.Cloud.useMasterKey();
                    if (!request.params.username) {
