@@ -63,8 +63,12 @@ Parse.Cloud.beforeSave(Parse.User, function (request, response) {
 
 Parse.Cloud.define('JoinWaitlist', function (request, response) {
     Parse.Cloud.useMasterKey();
-    if (!request.params.phone_number || !request.params.email) {
-        response.error('Phone number or e-mail is required to sign-up for the waitlist')
+    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+    if (!request.params.email) {
+        response.error('E-mail is required to sign-up for the waitlist')
+    }
+    else if (!re.test(request.params.email)) {
+        response.error('The provided e-mail is not in a valid e-mail format.')
     }
     else {
         var location = request.params.location
